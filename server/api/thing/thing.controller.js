@@ -11,6 +11,20 @@
 
 var _ = require('lodash');
 var Thing = require('./thing.model');
+var yelp = require ('yelp').createClient({
+  consumer_key: 'nLi7Dv_CyoqcJrz7jyf4Kg',
+  consumer_secret: 'GzTB0bJ1uLSZ0ZXjocprdWvzpsI',
+  token: 'lLEvAD4SeUK1iyt0pNihhsOzSxDmsr9M',
+  token_secret: 'FCzaYKhNuTjLu7D-V8N1Vb6l7-I'
+});
+
+//testing yelp
+exports.askYelp = function(req, res){
+  yelp.search({term: 'food', location: 'Boston'}, function(error, data) {
+    if (error) {console.log(error)};
+    return res.status(200).json(data);
+  })
+};
 
 // Get list of things
 exports.index = function(req, res) {

@@ -5,8 +5,9 @@ var controller = require('./thing.controller');
 
 var router = express.Router();
 
-router.get('/yelp', controller.askYelp);
+//router.get('/yelp', controller.askYelp);
 router.get('/', controller.index);
+router.get('/:location', controller.index);
 router.get('/:id', controller.show);
 router.post('/', controller.create);
 router.put('/:id', controller.update);

@@ -3,11 +3,23 @@
 angular.module('tonightApp')
   .controller('MainCtrl', function ($scope, $http, socket) {
     $scope.awesomeThings = [];
+    $scope.businesses = [];
+    $scope.location = 'Boston';
 
-    $http.get('/api/things').success(function(awesomeThings) {
-      $scope.awesomeThings = awesomeThings;
-      socket.syncUpdates('thing', $scope.awesomeThings);
-    });
+    $scope.getThing = function() {
+      var apiUrl = '/api/things';
+      if ($scope.location) {
+        apiUrl = apiUrl + '/' + $scope.location;
+      }
+      $http.get(apiUrl).success(function(awesomeThings) {
+        $scope.awesomeThings = awesomeThings;
+        $scope.businesses = awesomeThings.businesses;
+        //TODO: return only not close biz is_closed
+        //socket.syncUpdates('thing', $scope.awesomeThings);
+      });
+    };
+
+    $scope.getThing();
 
     $scope.addThing = function() {
       if($scope.newThing === '') {

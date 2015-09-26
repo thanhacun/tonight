@@ -18,16 +18,21 @@ var yelp = require ('yelp').createClient({
   token_secret: 'FCzaYKhNuTjLu7D-V8N1Vb6l7-I'
 });
 
-//testing yelp
-exports.askYelp = function(req, res){
-  yelp.search({term: 'food', location: 'Boston'}, function(error, data) {
-    if (error) {console.log(error)};
+//Get list of things in bars in Boston
+exports.index = function(req, res){
+  var locationName = req.params.location;
+  if (!locationName) {
+    return;
+  }
+  yelp.search({term: 'bar', location: locationName}, function(err, data) {
+    if (err) {return handleError(res, err)};
+    //console.log(JSON.stringify(data));
     return res.status(200).json(data);
   })
 };
 
 // Get list of things
-exports.index = function(req, res) {
+exports.index_no_use = function(req, res) {
   Thing.find(function (err, things) {
     if(err) { return handleError(res, err); }
     return res.status(200).json(things);

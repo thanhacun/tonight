@@ -4,24 +4,29 @@ header#banner.hero-unit
   .container
     h1 What's going on tonight?
     p.lead See which bar interesting tonight and RSVP ahead of time!
-    img(src='assets/images/yeoman.png', alt='I\'m Yeoman')
+    span.fa.fa-cab.fa-3x
+    span.fa.fa-glass.fa-3x
+    span.fa.fa-thumb-tack.fa-3x
 
 .container
+  form.location-form
+    h1.page-header.text-center Your location tonight!
+    p.input-group
+      input.form-control(type='text', placeholder='Boston | Paris | London...', ng-model='location')
+      span.input-group-btn
+        button.btn.btn-primary(type='submit', ng-click='getThing()', ng-disabled='!location') GO
   .row
     .col-lg-12
-      h1.page-header Features:
-      ul.nav.nav-tabs.nav-stacked.col-md-4.col-lg-4.col-sm-6(ng-repeat='thing in awesomeThings')
-        li
-          a(href='#', tooltip='{{thing.info}}')
-            | {{thing.name}}
-            button.close(type='button', ng-click='deleteThing(thing)') ×
+      h1.page-header.text-center Want to try?
+      .list-group.col-md-6.col-sm-12(ng-repeat='biz in businesses')
+        .list-group-item
+          a.pull-left(href='{{biz.url}}', tooltip='{{biz.name}}')
+            img.img-rounded(ng-src='{{biz.image_url}}')
+          strong.lead {{biz.name}}
+          p: em.clearfix {{biz.snippet_text}}
+          img(ng-src='{{biz.rating_img_url}}')
+          span.badge {{biz.review_count}}
 
-  form.thing-form
-    label Syncs in realtime across clients
-    p.input-group
-      input.form-control(type='text', placeholder='Add a new thing here.', ng-model='newThing')
-      span.input-group-btn
-        button.btn.btn-primary(type='submit', ng-click='addThing()') Add New
 
 footer.footer
   .container

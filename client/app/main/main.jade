@@ -18,15 +18,17 @@ header#banner.hero-unit
   .row
     .col-lg-12
       h1.page-header.text-center Want to try?
-      .list-group.col-md-6.col-sm-12(ng-repeat='biz in businesses')
-        .list-group-item
+      .media-list.list-group.col-md-6.col-sm-12(ng-repeat='biz in businesses')
+        .media.list-group-item
           a.pull-left(href='{{biz.url}}', tooltip='{{biz.name}}')
-            img.img-rounded(ng-src='{{biz.image_url}}')
-          strong.lead {{biz.name}}
-          p: em.clearfix {{biz.snippet_text}}
-          img(ng-src='{{biz.rating_img_url}}')
-          span.badge {{biz.review_count}}
-
+            img.media-object.img-rounded(ng-src='{{biz.image_url}}')
+          .media-body
+            a.badge.alert-danger.pull-right(href='#') GO
+            h4.media-heading.lead {{biz.name}}
+            p: em {{biz.snippet_text}}
+          p.clearfix
+            img(ng-src='{{biz.rating_img_url}}')
+            span.badge.pull-right {{biz.review_count}}
 
 footer.footer
   .container

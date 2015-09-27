@@ -9,4 +9,10 @@ var ThingSchema = new Schema({
   active: Boolean
 });
 
+var BarSchema = new Schema({
+  bar_id: String,
+  users: [{type:Schema.Types.ObjectId, ref: 'User'}]
+});
+
 module.exports = mongoose.model('Thing', ThingSchema);
+module.exports = mongoose.model('Bar', BarSchema);

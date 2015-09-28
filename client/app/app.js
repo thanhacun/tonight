@@ -6,7 +6,8 @@ angular.module('tonightApp', [
   'ngSanitize',
   'ngRoute',
   'btford.socket-io',
-  'ui.bootstrap'
+  'ui.bootstrap',
+  'ng.deviceDetector'
 ])
   .config(function ($routeProvider, $locationProvider, $httpProvider) {
     $routeProvider

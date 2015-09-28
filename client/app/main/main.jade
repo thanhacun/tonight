@@ -20,7 +20,7 @@ header#banner.hero-unit
       h1.page-header.text-center Want to try?
       .media-list.list-group.col-md-6.col-sm-12(ng-repeat='biz in businesses')
         .media.list-group-item
-          a.pull-left(href='{{biz.url}}', tooltip='{{biz.name}}')
+          a.pull-left(href='{{device==="unknown" ? biz.url: biz.mobile_url}}', tooltip='{{biz.name}}')
             img.media-object.img-rounded(ng-src='{{biz.image_url}}')
           .media-body
             a.badge.alert-danger.pull-right(href='#') GO

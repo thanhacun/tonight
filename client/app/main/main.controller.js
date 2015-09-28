@@ -1,10 +1,12 @@
 'use strict';
 
 angular.module('tonightApp')
-  .controller('MainCtrl', function ($scope, $http, socket) {
+  .controller('MainCtrl', function ($scope, $http, socket, deviceDetector) {
+    //using ng-devive-detector to detect client device to generate proper bar url: mobile or not
+    $scope.device = deviceDetector.device;
     $scope.awesomeThings = [];
     $scope.businesses = [];
-    $scope.location = 'Boston';
+    $scope.location = $scope.location || 'Boston';
 
     $scope.getThing = function() {
       var apiUrl = '/api/things';

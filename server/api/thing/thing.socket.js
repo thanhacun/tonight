@@ -22,3 +22,5 @@ function onSave(socket, doc, cb) {
 function onRemove(socket, doc, cb) {
   socket.emit('thing:remove', doc);
 }
+
+

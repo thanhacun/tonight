@@ -11,6 +11,7 @@
 
 var _ = require('lodash');
 var Thing = require('./thing.model');
+var User = require('../user/user.model');
 var yelp = require ('yelp').createClient({
   consumer_key: 'nLi7Dv_CyoqcJrz7jyf4Kg',
   consumer_secret: 'GzTB0bJ1uLSZ0ZXjocprdWvzpsI',
@@ -26,8 +27,18 @@ exports.index = function(req, res){
   }
   yelp.search({term: 'bar', location: locationName}, function(err, data) {
     if (err) {return handleError(res, err)};
+    //filter not closed businesses
+    data.businesses = data.businesses.filter(function(biz){
+      //not closed biz
+      return !biz.is_closed;
+    });
+    Thing.find(function (err, things){
+      data.bars = things;
+      return res.status(200).json(data);
+    })
+    //attach baz data
     //console.log(JSON.stringify(data));
-    return res.status(200).json(data);
+
   })
 };
 

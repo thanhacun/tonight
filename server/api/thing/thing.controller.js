@@ -10,6 +10,7 @@
 'use strict';
 
 var _ = require('lodash');
+var async = require('async');
 var Thing = require('./thing.model');
 var User = require('../user/user.model');
 var yelp = require ('yelp').createClient({
@@ -19,12 +20,10 @@ var yelp = require ('yelp').createClient({
   token_secret: 'FCzaYKhNuTjLu7D-V8N1Vb6l7-I'
 });
 
-//Get list of things in bars in Boston
+//Get list of things in bars location otherwise Boston
 exports.index = function(req, res){
   var locationName = req.params.location;
-  if (!locationName) {
-    return;
-  }
+  if (!locationName) { return;}
   yelp.search({term: 'bar', location: locationName}, function(err, data) {
     if (err) {return handleError(res, err)};
     //filter not closed businesses
@@ -32,14 +31,24 @@ exports.index = function(req, res){
       //not closed biz
       return !biz.is_closed;
     });
-    Thing.find(function (err, things){
-      data.bars = things;
+    async.map(data.businesses, function(biz, addUser){
+      //attach users information to biz data
+      Thing.findOne({bar_id: biz.id}, function(err, bar){
+        if (err || !bar) {
+          biz.users = [];
+          return addUser(null, biz);
+        } else {
+          console.log(bar.users);
+          biz.users = bar.users;
+          return addUser(null, biz);
+        }
+      })
+    }, function(err, results){
+      //TODO handle error
+      data.businesses = results;
       return res.status(200).json(data);
-    })
-    //attach baz data
-    //console.log(JSON.stringify(data));
-
-  })
+    });
+  });
 };
 
 // Get list of things
@@ -61,19 +70,23 @@ exports.show = function(req, res) {
 
 // Creates a new thing in the DB.
 exports.create = function(req, res) {
-  Thing.create(req.body, function(err, thing) {
-    if(err) { return handleError(res, err); }
-    return res.status(201).json(thing);
-  });
+  //remove before add
+  Thing.findOne({bar_id: req.body.bar_id}).remove(function(){
+    Thing.create(req.body, function(err, thing) {
+      if(err) { return handleError(res, err); }
+      return res.status(201).json(thing);
+    });
+  })
 };
 
 // Updates an existing thing in the DB.
 exports.update = function(req, res) {
-  if(req.body._id) { delete req.body._id; }
-  Thing.findById(req.params.id, function (err, thing) {
+  //if(req.body._id) { delete req.body._id; }
+  //using bar_id instead of _id
+  Thing.findOne({bar_id: req.params.id}, function (err, thing) {
     if (err) { return handleError(res, err); }
     if(!thing) { return res.status(404).send('Not Found'); }
-    var updated = _.merge(thing, req.body);
+    var updated = _.extend(thing, req.body);
     updated.save(function (err) {
       if (err) { return handleError(res, err); }
       return res.status(200).json(thing);

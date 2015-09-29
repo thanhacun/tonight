@@ -16,30 +16,49 @@ angular.module('tonightApp')
       $http.get(apiUrl).success(function(awesomeThings) {
         $scope.region = awesomeThings.region;
         $scope.businesses = awesomeThings.businesses;
-        console.log(JSON.stringify(awesomeThings));
+        console.log(JSON.stringify(awesomeThings.businesses[0]));
         //socket.syncUpdates('thing', $scope.awesomeThings);
       });
     };
 
     $scope.getThing();
-    $scope.toggleJoin = function(biz_id){
+    $scope.toggleJoin = function(biz){
       //check user log in
 
-      //check bar exist on database
-
-      //create bar data
-
-      //update bar's users data
-
-      //decide to join or no join
-      //add current user to join
-      $http.post('/api/things', {
-        bar_id: biz_id,
-        users: [{_id: Auth.getCurrentUser()._id}]
+      //initiate bar data
+      var bar = {bar_id: biz.id, users: biz.users || []};
+      //get user ids
+      var user_ids = biz.users.map(function(user){
+        return user._id;
       });
 
-      //remove current out of joinn
-      //$scope.delete('/api/things');
+      if (biz.users.length === 0) {
+        //bar NOT exist on database -- add new bar
+        bar.users.push({_id: Auth.getCurrentUser()._id});
+        $http.post('/api/things', bar);
+      } else {
+        //update bar
+        //user NOT yet join
+        if (user_ids.indexOf(Auth.getCurrentUser()._id) === -1) {
+          bar.users.push({_id: Auth.getCurrentUser()._id});
+        } else {
+          //user already join
+          bar.users.splice(user_ids.indexOf(Auth.getCurrentUser()._id), 1);
+        }
+        $http.put('/api/things/' + biz.id, bar)
+      }
+    };
+
+    $scope.joinClass = function(biz) {
+      //return true if current user already join
+      //console.log(biz.users);
+      biz.users.reduce(function(a, c){
+        if (!a) {
+          console.log(c === Auth.getCurrentUser()._id);
+          return c === Auth.getCurrentUser()._id;
+        }
+        return true;
+      }, false);
     };
 
     $scope.addThing = function(biz) {

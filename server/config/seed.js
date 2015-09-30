@@ -31,7 +31,6 @@ Thing.find({}).remove(function() {
 });
 */
 
-
 Thing.find({}).remove(function() {
   console.log('Empty bars');
 });

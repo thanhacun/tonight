@@ -6,7 +6,7 @@ angular.module('tonightApp')
     $scope.device = deviceDetector.device;
     $scope.awesomeThings = [];
     $scope.businesses = [];
-    $scope.location = $scope.location || 'Boston';
+    //$scope.location = $scope.location || 'Boston';
 
     $scope.getThing = function() {
       var apiUrl = '/api/things';
@@ -16,37 +16,28 @@ angular.module('tonightApp')
       $http.get(apiUrl).success(function(awesomeThings) {
         $scope.region = awesomeThings.region;
         $scope.businesses = awesomeThings.businesses;
-        console.log(JSON.stringify(awesomeThings.businesses[0]));
+        //console.log(JSON.stringify(awesomeThings.businesses));
         //socket.syncUpdates('thing', $scope.awesomeThings);
       });
     };
 
     $scope.getThing();
     $scope.toggleJoin = function(biz){
-      //check user log in
-
-      //initiate bar data
-      var bar = {bar_id: biz.id, users: biz.users || []};
-      //get user ids
-      var user_ids = biz.users.map(function(user){
-        return user._id;
-      });
-
-      if (biz.users.length === 0) {
-        //bar NOT exist on database -- add new bar
-        bar.users.push({_id: Auth.getCurrentUser()._id});
-        $http.post('/api/things', bar);
-      } else {
-        //update bar
+      //initiate bar data for update/add new
+      var bar = {bar_id: biz.id, users: [Auth.getCurrentUser()]};
+      //console.log(biz.users);
+      if (biz.users.indexOf(Auth.getCurrentUser()._id) === -1) {
         //user NOT yet join
-        if (user_ids.indexOf(Auth.getCurrentUser()._id) === -1) {
-          bar.users.push({_id: Auth.getCurrentUser()._id});
-        } else {
-          //user already join
-          bar.users.splice(user_ids.indexOf(Auth.getCurrentUser()._id), 1);
-        }
-        $http.put('/api/things/' + biz.id, bar)
+        //bar.users.push(Auth.getCurrentUser());
+        $http.put('/api/things/' + biz.id, bar);
+      } else {
+        //user already join
+        //add 0 to the begining of the array
+        bar.users.splice(0, 0, 0)
+        console.log(bar)
+        $http.put('/api/things/' + biz.id, bar);
       }
+
     };
 
     $scope.joinClass = function(biz) {

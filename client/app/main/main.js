@@ -5,7 +5,6 @@ angular.module('tonightApp')
     $routeProvider
       .when('/', {
         templateUrl: 'app/main/main.html',
-        controller: 'MainCtrl',
-        authenticate: true
+        controller: 'MainCtrl'
       });
   });

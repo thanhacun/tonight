@@ -23,8 +23,7 @@ header#banner.hero-unit
           a.pull-left(href='{{device==="unknown" ? biz.url: biz.mobile_url}}', tooltip='{{biz.name}}')
             img.media-object.img-rounded(ng-src='{{biz.image_url}}')
           .media-body
-            a.badge.btn.pull-right(href='#', ng-click='toggleJoin(biz)', ng-show='true') {{biz.users.length || 0}}
-            a.badge.btn.pull-right(href='#', ng-click='toggleJoin(biz)', ng-show='joinClass(biz)') {{biz.users.length || 0}}
+            a.badge.btn.pull-right(href='#', ng-click='toggleJoin(biz)', ng-class='{"alert-info": true}', ng-model='biz.users.length') {{biz.users.length || 0}} GOING
             h4.media-heading.lead {{biz.name}}
             p: em {{biz.snippet_text}}
           p.clearfix

@@ -2,15 +2,18 @@
 
 var express = require('express');
 var controller = require('./thing.controller');
+var auth = require('../../auth/auth.service');
 
 var router = express.Router();
 
 //router.get('/yelp', controller.askYelp);
+router.get('/bars', controller.bars);
+router.get('/users', controller.users);
 router.get('/', controller.index);
 router.get('/:location', controller.index);
 router.get('/:id', controller.show);
-router.post('/', controller.create);
-router.put('/:id', controller.update);
+router.post('/', auth.isAuthenticated(),controller.create);
+router.put('/:id', auth.isAuthenticated() ,controller.update);
 router.patch('/:id', controller.update);
 router.delete('/:id', controller.destroy);
 

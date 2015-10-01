@@ -5,6 +5,8 @@ var Schema = mongoose.Schema;
 var crypto = require('crypto');
 var authTypes = ['github', 'twitter', 'facebook', 'google'];
 
+var Thing = require('../thing/thing.model');
+
 var UserSchema = new Schema({
   name: String,
   email: { type: String, lowercase: true },
@@ -17,13 +19,13 @@ var UserSchema = new Schema({
   salt: String,
   twitter: {},
   github: {},
-  //bars: [{bar_id: String}],
-  //location: String
+  lastLocation: {type: String}
 });
 
 /**
  * Virtuals
  */
+
 UserSchema
   .virtual('password')
   .set(function(password) {
@@ -110,8 +112,9 @@ UserSchema
 /**
  * Methods
  */
+
 UserSchema.methods = {
-  /**
+   /**
    * Authenticate - check if the passwords are the same
    *
    * @param {String} plainText

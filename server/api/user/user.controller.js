@@ -8,6 +8,20 @@ var jwt = require('jsonwebtoken');
 var validationError = function(res, err) {
   return res.status(422).json(err);
 };
+/**
+ * Update user last location
+ */
+exports.update = function(req, res) {
+  //console.log(req.body, req.params);
+  User.findOne({_id: req.params.id}, function(err, user) {
+    if (err) return res.status(500).send(err);
+    user.lastLocation = req.body.lastLocation;
+    user.save(function(err, user) {
+      if(err) return res.status(500).send(err);
+      res.status(200).json(user);
+    })
+  });
+};
 
 /**
  * Get list of users

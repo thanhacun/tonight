@@ -4,59 +4,54 @@ angular.module('tonightApp')
   .controller('MainCtrl', function ($scope, $http, socket, Auth, deviceDetector) {
     //using ng-devive-detector to detect client device to generate proper bar url: mobile or not
     $scope.device = deviceDetector.device;
-    $scope.awesomeThings = [];
+    //$scope.awesomeThings = [];
     $scope.businesses = [];
-    //$scope.location = $scope.location || 'Boston';
+    $scope.getCurrentUser = Auth.getCurrentUser;
+    $scope.apiUrl = '/api/things';
 
+    /**
+     * request bars information based on location
+     */
     $scope.getThing = function() {
-      var apiUrl = '/api/things';
-      if ($scope.location) {
-        apiUrl = apiUrl + '/' + $scope.location;
+      if ($scope.getCurrentUser().lastLocation) {
+        $scope.apiUrl = '/api/things/' + $scope.getCurrentUser().lastLocation;
       }
-      $http.get(apiUrl).success(function(awesomeThings) {
-        $scope.region = awesomeThings.region;
+      $http.get($scope.apiUrl).success(function(awesomeThings) {
+        //$scope.region = awesomeThings.region;
         $scope.businesses = awesomeThings.businesses;
-        //console.log(JSON.stringify(awesomeThings.businesses));
-        //socket.syncUpdates('thing', $scope.awesomeThings);
+        socket.syncUpdates('thing', $scope.businesses);
       });
     };
 
     $scope.getThing();
+
+    /**
+     * Handle joining going to the bar or not
+     * bar create --> user add | user remove
+     * user location update
+     * @param biz
+     */
     $scope.toggleJoin = function(biz){
       //initiate bar data for update/add new
       var bar = {bar_id: biz.id, users: [Auth.getCurrentUser()]};
-      //console.log(biz.users);
-      if (biz.users.indexOf(Auth.getCurrentUser()._id) === -1) {
-        //user NOT yet join
-        //bar.users.push(Auth.getCurrentUser());
-        $http.put('/api/things/' + biz.id, bar);
+      var userIndex = biz.users.indexOf(Auth.getCurrentUser()._id);
+      if (userIndex !== -1) {
+        //user already join, add 0 to the begining of the array for preparing remove
+        bar.users.splice(0, 0, 0);
+
+        //remove user from biz.users to update users count
+        biz.users.splice(userIndex, 1);
       } else {
-        //user already join
-        //add 0 to the begining of the array
-        bar.users.splice(0, 0, 0)
-        console.log(bar)
-        $http.put('/api/things/' + biz.id, bar);
+        //add user to biz.users to update users count
+        biz.users.push(Auth.getCurrentUser()._id);
       }
 
-    };
+      //update bar
+      $http.put('/api/things/' + biz.id, bar).then(function() {
+        //update user last location
+        $http.put('/api/users/' + Auth.getCurrentUser()._id, {lastLocation: $scope.getCurrentUser().lastLocation});
+      })
 
-    $scope.joinClass = function(biz) {
-      //return true if current user already join
-      //console.log(biz.users);
-      biz.users.reduce(function(a, c){
-        if (!a) {
-          console.log(c === Auth.getCurrentUser()._id);
-          return c === Auth.getCurrentUser()._id;
-        }
-        return true;
-      }, false);
-    };
-
-    $scope.addThing = function(biz) {
-      $http.post('/api/things', biz).success(function(addedBiz){
-        console.log(addedBiz);
-      });
-      //$scope.newThing = '';
     };
 
     $scope.deleteThing = function(thing) {

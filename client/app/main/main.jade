@@ -7,17 +7,20 @@ header#banner.hero-unit
     span.fa.fa-cab.fa-3x
     span.fa.fa-glass.fa-3x
     span.fa.fa-thumb-tack.fa-3x
+    //span.fa.fa-3x.fa-spinner.fa-spin
 
-.container
+.container.main-content
   form.location-form
     h1.text-center Your location tonight!
     p.input-group
-      input.form-control(type='text', placeholder='Boston | Paris | London...', ng-model='getCurrentUser().lastLocation')
+      input.form-control(type='text', placeholder='Boston | Paris | London...', ng-model='searchLocation')
       span.input-group-btn
-        button.btn.btn-primary(type='submit', ng-click='getThing()', ng-disabled='!getCurrentUser().lastLocation') GO
+        button.btn.btn-primary(type='submit', ng-click='getThing()', ng-disabled='!searchLocation || barSearching')
+          i.fa.fa-search(ng-hide='barSearching')
+          i.fa.fa-spin.fa-spinner(ng-show='barSearching')
   .row
-    .col-lg-12
-      h1.page-header.text-center Want to try?
+    .col-lg-12(ng-show='businesses')
+      h1.text-center Want to try?
       .media-list.list-group.col-md-6.col-sm-12(ng-repeat='biz in businesses')
         .media.list-group-item
           a.pull-left(href='{{device==="unknown" ? biz.url: biz.mobile_url}}', tooltip='{{biz.name}}')

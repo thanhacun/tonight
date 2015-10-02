@@ -41,7 +41,7 @@ exports.users= function(req, res) {
 //Get list of bars in a location otherwise nothing
 exports.index = function(req, res){
   var locationName = req.params.location;
-  if (!locationName) { return;}
+  if (!locationName) return res.status(200).json({});
   yelp.search({term: 'bar', location: locationName}, function(err, data) {
     if (err) return handleError(res, err);
     //filter not closed businesses

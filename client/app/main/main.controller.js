@@ -4,21 +4,39 @@ angular.module('tonightApp')
   .controller('MainCtrl', function ($scope, $http, socket, Auth, deviceDetector) {
     //using ng-devive-detector to detect client device to generate proper bar url: mobile or not
     $scope.device = deviceDetector.device;
-    $scope.businesses = [];
+    //$scope.businesses = [];
     $scope.getCurrentUser = Auth.getCurrentUser;
-    $scope.apiUrl = '/api/things';
+    $scope.isLoggedInAsync = Auth.isLoggedInAsync;
+    $scope.barSearching = false;
 
     /**
      * request bars information based on location
+     * should using isLoggedInAsync to get user info correctly
      */
     $scope.getThing = function() {
-      if ($scope.getCurrentUser().lastLocation) {
-        $scope.apiUrl = '/api/things/' + Auth.getCurrentUser().lastLocation;
-      }
-      $http.get($scope.apiUrl).success(function(awesomeThings) {
-        $scope.businesses = awesomeThings.businesses;
-        socket.syncUpdates('thing', $scope.businesses);
-      });
+      Auth.isLoggedInAsync(function(userLogged) {
+        //wait until user information available
+        if (userLogged) {
+          $scope.searchLocation = $scope.searchLocation || Auth.getCurrentUser().lastLocation;
+          $scope.apiUrl = '/api/things/' + $scope.searchLocation;
+        } else {
+          $scope.apiUrl = '/api/things/' + ($scope.searchLocation || '');
+        }
+        //getting bar information
+        //show spinner
+        $scope.barSearching = true;
+        $http.get($scope.apiUrl)
+          .success(function(awesomeThings) {
+            $scope.businesses = awesomeThings.businesses;
+            //TODO: sync update thing and user location
+            socket.syncUpdates('thing', $scope.businesses);
+          })
+          .finally(function() {
+            //hide spinner
+            $scope.barSearching = false;
+          });
+      })
+
     };
 
     $scope.getThing();
@@ -47,7 +65,7 @@ angular.module('tonightApp')
       //update bar
       $http.put('/api/things/' + biz.id, bar).then(function() {
         //update user last location
-        $http.put('/api/users/' + Auth.getCurrentUser()._id, {lastLocation: Auth.getCurrentUser().lastLocation});
+        $http.put('/api/users/' + Auth.getCurrentUser()._id, {lastLocation: $scope.searchLocation});
       })
 
     };

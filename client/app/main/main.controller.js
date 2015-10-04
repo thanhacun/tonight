@@ -29,7 +29,7 @@ angular.module('tonightApp')
           .success(function(awesomeThings) {
             $scope.businesses = awesomeThings.businesses;
             //TODO: sync update thing and user location
-            socket.syncUpdates('thing', $scope.businesses);
+            //socket.syncUpdates('thing', $scope.businesses);
           })
           .finally(function() {
             //hide spinner
